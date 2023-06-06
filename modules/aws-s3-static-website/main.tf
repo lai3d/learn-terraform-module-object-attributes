@@ -22,11 +22,38 @@ resource "aws_s3_bucket_website_configuration" "web" {
   }
 }
 
-resource "aws_s3_bucket_acl" "web" {
+// reference: https://registry.terraform.io/providers/hashicorp/aws/5.1.0/docs/resources/s3_bucket_acl
+resource "aws_s3_bucket_ownership_controls" "web" {
+  bucket = aws_s3_bucket.web.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "web" {
   bucket = aws_s3_bucket.web.id
 
-  acl = "public-read"
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }
+
+resource "aws_s3_bucket_acl" "web" {
+  depends_on = [
+    aws_s3_bucket_ownership_controls.web,
+    aws_s3_bucket_public_access_block.web,
+  ]
+
+  bucket = aws_s3_bucket.web.id
+  acl    = "public-read"
+}
+
+# resource "aws_s3_bucket_acl" "web" {
+#   bucket = aws_s3_bucket.web.id
+
+#   acl = "public-read"
+# }
 
 resource "aws_s3_bucket_policy" "web" {
   bucket = aws_s3_bucket.web.id
