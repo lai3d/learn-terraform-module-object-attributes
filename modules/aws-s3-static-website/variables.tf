@@ -21,6 +21,7 @@ variable "tags" {
   default     = {}
 }
 
+/*
 variable "index_document_suffix" {
   description = "Suffix for index documents."
   type        = string
@@ -43,4 +44,15 @@ variable "terraform_managed_files" {
   description = "Flag to indicate whether Terraform should upload files to the bucket."
   type        = bool
   default     = true
+}
+*/
+
+variable "files" {
+  description = "Configuration for website files."
+  type = object({
+    terraform_managed     = bool
+    error_document_key    = optional(string, "error.html")
+    index_document_suffix = optional(string, "index.html")
+    www_path              = optional(string)
+  })
 }
